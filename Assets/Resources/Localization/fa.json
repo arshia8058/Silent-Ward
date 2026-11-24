@@ -1,0 +1,10 @@
+{ "entries": [
+  { "key": "menu.continue", "value": "ادامه بازی" },
+  { "key": "menu.newgame", "value": "بازی جدید" },
+  { "key": "menu.settings", "value": "تنظیمات" },
+  { "key": "menu.language", "value": "زبان" },
+  { "key": "interact.read", "value": "خواندن" },
+  { "key": "interact.open", "value": "باز کردن" },
+  { "key": "interact.take", "value": "برداشتن" },
+  { "key": "hud.objective.ch1", "value": "از بخش بستری خارج شو" }
+] }

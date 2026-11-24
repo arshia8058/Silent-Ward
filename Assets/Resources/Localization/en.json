@@ -1,0 +1,10 @@
+{ "entries": [
+  { "key": "menu.continue", "value": "Continue" },
+  { "key": "menu.newgame", "value": "New Game" },
+  { "key": "menu.settings", "value": "Settings" },
+  { "key": "menu.language", "value": "Language" },
+  { "key": "interact.read", "value": "Read" },
+  { "key": "interact.open", "value": "Open" },
+  { "key": "interact.take", "value": "Take" },
+  { "key": "hud.objective.ch1", "value": "Leave the inpatient ward" }
+] }
