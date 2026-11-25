@@ -16,6 +16,13 @@ namespace SilentWard.Puzzle
         [SerializeField] private AudioClip switchClickClip;
         [SerializeField] private AudioClip powerOnClip;
 
+        /// <summary>Runtime audio wiring (procedural clips) — set by AudioBootstrap.</summary>
+        public void SetClips(AudioClip click, AudioClip power)
+        {
+            switchClickClip = click;
+            powerOnClip = power;
+        }
+
         private readonly List<int> pressed = new List<int>();
         public IReadOnlyList<int> PressedSoFar => pressed;
         public int SwitchCount => correctOrder.Count;

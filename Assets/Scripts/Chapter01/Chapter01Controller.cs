@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using SilentWard.Audio;
 using SilentWard.Core;
 using SilentWard.Dialogue;
 using SilentWard.Player;
@@ -89,6 +90,7 @@ namespace SilentWard.Chapter01
         /// <summary>Called by DocumentPickup when the player reads a document.</summary>
         public void NotifyDocumentRead(string documentId)
         {
+            AudioManager.Instance?.PlaySfx(ProceduralAudio.Pickup, 0.8f);
             switch (documentId)
             {
                 case "wristband":
@@ -138,6 +140,7 @@ namespace SilentWard.Chapter01
         {
             if (leilaHeard) return;
             leilaHeard = true;
+            AudioManager.Instance?.PlaySfx(ProceduralAudio.SpeakerStatic, 0.7f);
             health?.DrainFocus(15f); // first hallucination: focus, not health
             Play(Chapter01Dialogue.LeilaDialogue(),
                 () => { if (CurrentStage == Stage.HearLeila) SetStage(Stage.OpenElevator); });
@@ -147,6 +150,8 @@ namespace SilentWard.Chapter01
         public void OpenElevator()
         {
             if (CurrentStage != Stage.OpenElevator) return;
+            AudioManager.Instance?.PlaySfx(ProceduralAudio.ElevatorDing, 0.9f);
+            AudioManager.Instance?.PlaySfx(ProceduralAudio.Door, 0.5f);
             Play(Chapter01Dialogue.ElevatorDialogue(), () =>
             {
                 SetStage(Stage.Done);

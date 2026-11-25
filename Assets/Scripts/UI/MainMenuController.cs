@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using SilentWard.Audio;
 using SilentWard.Core;
 
 namespace SilentWard.UI
@@ -17,14 +18,17 @@ namespace SilentWard.UI
         {
             if (newGameButton != null)
                 newGameButton.onClick.AddListener(() =>
-                    GameManager.Instance?.StartChapter(1, "Chapter01"));
+                {
+                    Click();
+                    GameManager.Instance?.StartChapter(1, "Chapter01");
+                });
             if (continueButton != null)
             {
-                continueButton.onClick.AddListener(() => GameManager.Instance?.ContinueGame());
+                continueButton.onClick.AddListener(() => { Click(); GameManager.Instance?.ContinueGame(); });
                 continueButton.interactable = SaveSystem.Load(0) != null;
             }
             if (languageButton != null)
-                languageButton.onClick.AddListener(ToggleLanguage);
+                languageButton.onClick.AddListener(() => { Click(); ToggleLanguage(); });
             RefreshLabels();
             var loc = LocalizationManager.Instance;
             if (loc != null) loc.OnLanguageChanged += RefreshLabels;
@@ -35,6 +39,9 @@ namespace SilentWard.UI
             var loc = LocalizationManager.Instance;
             if (loc != null) loc.OnLanguageChanged -= RefreshLabels;
         }
+
+        private static void Click() =>
+            AudioManager.Instance?.PlaySfx(ProceduralAudio.Click, 0.5f);
 
         private void ToggleLanguage()
         {

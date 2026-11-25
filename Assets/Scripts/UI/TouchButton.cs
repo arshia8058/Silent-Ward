@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using SilentWard.Audio;
 using SilentWard.Player;
 
 namespace SilentWard.UI
@@ -35,6 +36,7 @@ namespace SilentWard.UI
         public void OnPointerDown(PointerEventData eventData)
         {
             Resolve();
+            AudioManager.Instance?.PlaySfx(ProceduralAudio.Click, 0.5f);
             switch (action)
             {
                 case Action.MoveLeft: if (player != null) player.MoveInput = -1f; break;
