@@ -48,7 +48,7 @@ namespace SilentWard.Art
         /// dark background, whatever the scene file says.</summary>
         private static void FixCamera()
         {
-            var cam = Camera.main;
+            var cam = UnityEngine.Camera.main;
             if (cam == null) return;
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.01f, 0.01f, 0.02f, 1f);
