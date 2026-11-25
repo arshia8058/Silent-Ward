@@ -41,6 +41,7 @@ namespace SilentWard.UI
     public class PersianUiBootstrap : MonoBehaviour
     {
         private static bool fontReady;
+        public static bool FontReady => fontReady;
         private float scanTimer;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -72,6 +73,7 @@ namespace SilentWard.UI
             if (scanTimer <= 0f)
             {
                 scanTimer = 0.5f;
+                if (!fontReady) SetupFont();
                 AttachAll();
             }
         }
@@ -86,20 +88,21 @@ namespace SilentWard.UI
         private static void SetupFont()
         {
             if (fontReady) return;
-            fontReady = true;
             try
             {
-                var osFont = Font.CreateDynamicFontFromOSFont(
-                    new[]
-                    {
-                        "Noto Naskh Arabic", "Noto Sans Arabic",
-                        "Droid Arabic Naskh", "Droid Sans", "sans-serif"
-                    }, 36);
-                if (osFont == null) return;
+                var osFont = FindPersianFont();
+                if (osFont == null) return; // retry on next scene load / scan
 
                 var dyn = TMP_FontAsset.CreateFontAsset(osFont);
                 if (dyn == null) return;
                 dyn.name = "PersianOSFont";
+                try
+                {
+                    string missing;
+                    dyn.TryAddCharacters(
+                        "ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأإؤئءةۀ۱۲۳۴۵۶۷۸۹۰0123456789ـ،؛؟!«»:؛", out missing);
+                }
+                catch (System.Exception) { }
 
                 foreach (var fa in Resources.FindObjectsOfTypeAll<TMP_FontAsset>())
                 {
@@ -107,11 +110,57 @@ namespace SilentWard.UI
                     var table = fa.fallbackFontAssetTable;
                     if (table != null && !table.Contains(dyn)) table.Add(dyn);
                 }
+                fontReady = true;
             }
             catch (System.Exception)
             {
                 // Never crash over a font — worst case text stays as boxes.
             }
+        }
+
+        /// <summary>Finds a font on THIS device that really contains Persian
+        /// glyphs. The old version trusted a few hard-coded names; on phones
+        /// where those names miss (e.g. MIUI), it silently fell back to a
+        /// Latin-only font and Persian stayed as boxes. Now every installed
+        /// font is a candidate and each is verified with HasCharacter.</summary>
+        private static Font FindPersianFont()
+        {
+            string[] preferred =
+            {
+                "Noto Naskh Arabic", "Noto Sans Arabic", "Noto Naskh Arabic UI",
+                "Noto Sans Arabic UI", "Droid Arabic Naskh", "Droid Sans Arabic",
+                "Vazirmatn", "Vazir", "Tahoma", "Arial"
+            };
+            foreach (var name in preferred)
+            {
+                var f = TryFont(name);
+                if (f != null) return f;
+            }
+            try
+            {
+                foreach (var name in Font.GetOSInstalledFontNames())
+                {
+                    if (string.IsNullOrEmpty(name)) continue;
+                    var f = TryFont(name);
+                    if (f != null) return f;
+                }
+            }
+            catch (System.Exception) { }
+            return null;
+        }
+
+        private static Font TryFont(string name)
+        {
+            try
+            {
+                var f = Font.CreateDynamicFontFromOSFont(name, 36);
+                if (f == null) return null;
+                f.RequestCharactersInTexture("سلام", 36, FontStyle.Normal);
+                bool ok = f.HasCharacter('س') && f.HasCharacter('ا') && f.HasCharacter('م');
+                if (!ok) { Destroy(f); return null; }
+                return f;
+            }
+            catch (System.Exception) { return null; }
         }
     }
 }

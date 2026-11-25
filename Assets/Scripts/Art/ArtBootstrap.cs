@@ -37,10 +37,31 @@ namespace SilentWard.Art
         {
             try
             {
+                FixCamera();
                 if (scene.name == "MainMenu") ApplyMenu();
                 else if (scene.name == "Chapter01") ApplyChapter();
             }
             catch (Exception e) { Debug.Log("ArtBootstrap apply failed: " + e.Message); }
+        }
+
+        /// <summary>Runtime guarantee: the scene camera always paints a solid
+        /// dark background, whatever the scene file says.</summary>
+        private static void FixCamera()
+        {
+            var cam = Camera.main;
+            if (cam == null) return;
+            cam.clearFlags = CameraClearFlags.SolidColor;
+            cam.backgroundColor = new Color(0.01f, 0.01f, 0.02f, 1f);
+        }
+
+        private static Sprite SolidSprite(Color c)
+        {
+            var t = new Texture2D(4, 4, TextureFormat.RGBA32, false);
+            var px = new Color[16];
+            for (int i = 0; i < px.Length; i++) px[i] = c;
+            t.SetPixels(px);
+            t.Apply();
+            return Sprite.Create(t, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 1f);
         }
 
         // ---------- data access ----------
@@ -178,7 +199,15 @@ namespace SilentWard.Art
         private static void ApplyChapter()
         {
             // Backdrop: flat corridor plate behind everything.
-            Place("ArtBackdrop", FullSprite("bg_flat", 12.3f, 0.5f), new Vector3(14f, 4.4f, 8f), -10);
+            var backdrop = Place("ArtBackdrop", FullSprite("bg_flat", 12.3f, 0.5f), new Vector3(14f, 4.4f, 8f), -10);
+            if (backdrop == null)
+            {
+                // Fallback guarantee: even if the art texture ever fails to
+                // decode, the world is painted with a dark wall, never void.
+                var fb = Place("ArtBackdrop", SolidSprite(new Color(0.07f, 0.09f, 0.13f, 1f)),
+                    new Vector3(14f, 4.4f, 8f), -10);
+                if (fb != null) fb.transform.localScale = new Vector3(10f, 3.1f, 1f);
+            }
 
             // Hide placeholder quads (colliders and logic stay untouched).
             HideOwnRenderer(Find("Bed"));
